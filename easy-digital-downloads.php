@@ -91,6 +91,14 @@ final class Easy_Digital_Downloads {
 	public $html;
 
 	/**
+	 * EDD Webhooks Object
+	 *
+	 * @var object
+	 * @since 1.9
+	 */
+	public $webhooks;
+
+	/**
 	 * Main Easy_Digital_Downloads Instance
 	 *
 	 * Insures that only one instance of Easy_Digital_Downloads exists in memory at any one
@@ -116,6 +124,7 @@ final class Easy_Digital_Downloads {
 			self::$instance->api = new EDD_API();
 			self::$instance->session = new EDD_Session();
 			self::$instance->html = new EDD_HTML_Elements();
+			self::$instance->webhooks = new EDD_Webhooks();
 		}
 		return self::$instance;
 	}
@@ -203,6 +212,7 @@ final class Easy_Digital_Downloads {
 		require_once EDD_PLUGIN_DIR . 'includes/class-edd-session.php';
 		require_once EDD_PLUGIN_DIR . 'includes/class-edd-stats.php';
 		require_once EDD_PLUGIN_DIR . 'includes/class-edd-roles.php';
+		require_once EDD_PLUGIN_DIR . 'includes/class-edd-webhooks.php';
 		require_once EDD_PLUGIN_DIR . 'includes/country-functions.php';
 		require_once EDD_PLUGIN_DIR . 'includes/formatting.php';
 		require_once EDD_PLUGIN_DIR . 'includes/widgets.php';
@@ -254,7 +264,7 @@ final class Easy_Digital_Downloads {
 			require_once EDD_PLUGIN_DIR . 'includes/admin/reporting/graphing.php';
 			require_once EDD_PLUGIN_DIR . 'includes/admin/settings/display-settings.php';
 			require_once EDD_PLUGIN_DIR . 'includes/admin/settings/contextual-help.php';
-			require_once EDD_PLUGIN_DIR . 'includes/admin/tools.php';
+			require_once EDD_PLUGIN_DIR . 'includes/admin/tools/tools.php';
 			require_once EDD_PLUGIN_DIR . 'includes/admin/plugins.php';
 			require_once EDD_PLUGIN_DIR . 'includes/admin/upgrades/upgrade-functions.php';
 			require_once EDD_PLUGIN_DIR . 'includes/admin/upgrades/upgrades.php';
