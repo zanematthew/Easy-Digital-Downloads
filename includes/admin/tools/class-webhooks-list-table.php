@@ -129,7 +129,7 @@ class EDD_Webhooks_Table extends WP_List_Table {
 	 */
 	public function get_sortable_columns() {
 		return array(
-			'name'   => array( 'name', false )
+			'name' => array( 'name', false )
 		);
 	}
 
@@ -246,8 +246,10 @@ class EDD_Webhooks_Table extends WP_List_Table {
 			if ( 'delete' === $this->current_action() ) {
 			}
 			if ( 'activate' === $this->current_action() ) {
+				EDD()->webhooks->activate_hook( $id );
 			}
 			if ( 'deactivate' === $this->current_action() ) {
+				EDD()->webhooks->deactivate_hook( $id );
 			}
 		}
 

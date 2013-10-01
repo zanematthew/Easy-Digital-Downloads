@@ -23,6 +23,7 @@ class EDD_Webhooks {
 		// Create the log post type
 		add_action( 'init', array( $this, 'register_post_type' ), 12 );
 		add_action( 'edd_add_webhook', array( $this, 'new_hook' ) );
+		add_action( 'edd_edit_webhook', array( $this, 'edit_hook' ) );
 	}
 
 	public function register_post_type() {
@@ -56,6 +57,47 @@ class EDD_Webhooks {
 		return wp_insert_post( $args );
 	}
 
+	public function delete_hook( $hook_id = 0 ) {
+
+	}
+
+	public function update_hook( $args = array() ) {
+
+		$defaults = array(
+			'ID'          => 0,
+			'post_status' => 'inactive'
+		);
+
+		if( isset( $args['status'] ) ) {
+			$args['post_status'] = $args['status'];
+			unset( $args['status'] );
+		}
+
+		if( isset( $args['name'] ) ) {
+			$args['post_title'] = $args['name'];
+			unset( $args['name'] );
+		}
+
+		if( isset( $args['url'] ) ) {
+			$args['guid'] = $args['url'];
+			unset( $args['url'] );
+		}
+
+		//print_r( $args ); exit;
+
+		$args = wp_parse_args( $args, $defaults );
+
+		return wp_update_post( $args );
+	}
+
+	public function activate_hook( $hook_id = 0 ) {
+		return $this->update_hook( array( 'ID' => $hook_id, 'status' => 'active' ) );
+	}
+
+	public function deactivate_hook( $hook_id = 0 ) {
+		return $this->update_hook( array( 'ID' => $hook_id, 'status' => 'inactive' ) );
+	}
+
 	public function new_hook( $data = array() ) {
 		if ( ! isset( $data['edd-webhooks-nonce'] ) || ! wp_verify_nonce( $data['edd-webhooks-nonce'], 'edd_webhooks_nonce' ) )
 			return;
@@ -80,25 +122,33 @@ class EDD_Webhooks {
 		}
 	}
 
-	public function delete_hook( $name = '' ) {
+	public function edit_hook( $data = array() ) {
+		if ( ! isset( $data['edd-webhooks-nonce'] ) || ! wp_verify_nonce( $data['edd-webhooks-nonce'], 'edd_webhooks_nonce' ) )
+			return;
 
+		// Setup the webhook code details
+		$args = array();
+
+		foreach ( $data as $key => $value ) {
+			if ( $key != 'edd-webhook-nonce' && $key != 'edd-action' && $key != 'edd-redirect' ) {
+				if ( is_string( $value ) || is_int( $value ) )
+					$args[ $key ] = strip_tags( addslashes( $value ) );
+				elseif ( is_array( $value ) )
+					$args[ $key ] = array_map( 'trim', $value );
+			}
+		}
+
+
+		if ( $this->update_hook( $args ) ) {
+			wp_redirect( add_query_arg( 'edd-message', 'webhook_updated', $data['edd-redirect'] ) ); edd_die();
+		} else {
+			wp_redirect( add_query_arg( 'edd-message', 'webhook_update_failed', $data['edd-redirect'] ) ); edd_die();
+		}
 	}
 
-	public function update_hook( $args = array() ) {
+	public function send_hook( $hook_id = 0, $data = array() ) {
 
-	}
-
-	public function activate_hook( $name = '' ) {
-		return $this->update_hook( array( 'name' => $name, 'status' => 'active' ) );
-	}
-
-	public function dectivate_hook( $name = '' ) {
-		return $this->update_hook( array( 'name' => $name, 'status' => 'inactive' ) );
-	}
-
-	public function send_hook( $name = '', $data = array() ) {
-
-		$hook = $this->get_hook( $name );
+		$hook = $this->get_hook( $hook_id );
 		if( ! $hook )
 			return false;
 
@@ -111,7 +161,7 @@ class EDD_Webhooks {
 			'blocking'    => false,
 			'body'        => $data,
     	);
-		$args = apply_filters( 'edd_webhook_send_args', $args, $name, $data );
+		$args = apply_filters( 'edd_webhook_send_args', $args, $hook_id, $data );
 
 		// Send the request
 		$request = wp_remote_post( $uri, $args );

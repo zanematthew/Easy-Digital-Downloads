@@ -1,6 +1,6 @@
 <?php
 /**
- * Add Webhook Page
+ * Edit Webhook Page
  *
  * @package     EDD
  * @subpackage  Admin/Tools/Webhooks
@@ -11,10 +11,17 @@
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
+
+if ( ! isset( $_GET['webhook'] ) || ! is_numeric( $_GET['webhook'] ) ) {
+	wp_die( __( 'Something went wrong.', 'edd' ), __( 'Error', 'edd' ) );
+}
+
+$webhook_id  = absint( $_GET['webhook'] );
+
 ?>
-<h2><?php _e( 'Add New Webhook', 'edd' ); ?> - <a href="<?php echo admin_url( 'edit.php?post_type=download&page=edd-tools&tab=webhooks' ); ?>" class="button-secondary"><?php _e( 'Go Back', 'edd' ); ?></a></h2>
-<form id="edd-add-discount" action="" method="POST">
-	<?php do_action( 'edd_add_webhook_form_top' ); ?>
+<h2><?php _e( 'Edit Webhook', 'edd' ); ?> - <a href="<?php echo admin_url( 'edit.php?post_type=download&page=edd-tools&tab=webhooks' ); ?>" class="button-secondary"><?php _e( 'Go Back', 'edd' ); ?></a></h2>
+<form id="edd-edit-webhook" action="" method="POST">
+	<?php do_action( 'edd_edit_webhook_form_top' ); ?>
 	<table class="form-table">
 		<tbody>
 			<tr class="form-field">
@@ -22,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 					<label for="edd-name"><?php _e( 'Name', 'edd' ); ?></label>
 				</th>
 				<td>
-					<input name="name" id="edd-name" type="text" value="" style="width: 300px;"/>
+					<input name="name" id="edd-name" type="text" value="<?php echo esc_attr( get_post_field( 'post_title', $webhook_id ) ); ?>" style="width: 300px;"/>
 					<p class="description"><?php _e( 'The name of this webhook', 'edd' ); ?></p>
 				</td>
 			</tr>
@@ -31,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 					<label for="edd-url"><?php _e( 'Webhook URL', 'edd' ); ?></label>
 				</th>
 				<td>
-					<input type="text" id="edd-url" name="url" value="" style="width: 300px;"/>
+					<input type="text" id="edd-url" name="url" value="<?php echo esc_attr( get_post_field( 'guid', $webhook_id ) ); ?>" style="width: 300px;"/>
 					<p class="description"><?php _e( 'Enter a url to send the remote request to', 'edd' ); ?></p>
 				</td>
 			</tr>
@@ -41,19 +48,20 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 				</th>
 				<td>
 					<select name="status" id="edd-status">
-						<option value="active"><?php _e( 'Active', 'edd' ); ?></option>
-						<option value="inactive"><?php _e( 'Inactive', 'edd' ); ?></option>
+						<option value="active"<?php selected( 'active', get_post_status( $webhook_id ) );?>><?php _e( 'Active', 'edd' ); ?></option>
+						<option value="inactive"<?php selected( 'inactive', get_post_status( $webhook_id ) );?>><?php _e( 'Inactive', 'edd' ); ?></option>
 					</select>
 					<p class="description"><?php _e( 'Set the webhook to active or inactive?', 'edd' ); ?></p>
 				</td>
 			</tr>
 		</tbody>
 	</table>
-	<?php do_action( 'edd_add_webhook_form_bottom' ); ?>
+	<?php do_action( 'edd_edit_webhook_form_bottom' ); ?>
 	<p class="submit">
-		<input type="hidden" name="edd-action" value="add_webhook"/>
+		<input type="hidden" name="ID" value="<?php echo $webhook_id; ?>"/>
+		<input type="hidden" name="edd-action" value="edit_webhook"/>
 		<input type="hidden" name="edd-redirect" value="<?php echo esc_url( admin_url( 'edit.php?post_type=download&page=edd-tools&tab=webhooks' ) ); ?>"/>
 		<input type="hidden" name="edd-webhooks-nonce" value="<?php echo wp_create_nonce( 'edd_webhooks_nonce' ); ?>"/>
-		<input type="submit" value="<?php _e( 'Add Webhook', 'edd' ); ?>" class="button-primary"/>
+		<input type="submit" value="<?php _e( 'Update Webhook', 'edd' ); ?>" class="button-primary"/>
 	</p>
 </form>
