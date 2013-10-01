@@ -175,11 +175,11 @@ class EDD_Webhooks_Table extends WP_List_Table {
 		$row_actions['edit'] = '<a href="' . add_query_arg( array( 'view' => 'edit_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Edit', 'edd' ) . '</a>';
 
 		if( strtolower( $item->status ) == 'active' )
-			$row_actions['deactivate'] = '<a href="' . add_query_arg( array( 'view' => 'deactivate_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Deactivate', 'edd' ) . '</a>';
+			$row_actions['deactivate'] = '<a href="' . add_query_arg( array( 'edd_action' => 'deactivate_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Deactivate', 'edd' ) . '</a>';
 		else
-			$row_actions['activate'] = '<a href="' . add_query_arg( array( 'view' => 'activate_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Activate', 'edd' ) . '</a>';
+			$row_actions['activate'] = '<a href="' . add_query_arg( array( 'edd_action' => 'activate_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Activate', 'edd' ) . '</a>';
 
-		$row_actions['delete'] = '<a href="' . wp_nonce_url( add_query_arg( array( 'view' => 'delete_webhook', 'webhook' => $webhook->ID ) ), 'edd_webhook_nonce' ) . '">' . __( 'Delete', 'edd' ) . '</a>';
+		$row_actions['delete'] = '<a href="' . wp_nonce_url( add_query_arg( array( 'edd_action' => 'delete_webhook', 'webhook' => $webhook->ID ) ), 'edd_webhooks_nonce' ) . '">' . __( 'Delete', 'edd' ) . '</a>';
 
 		$row_actions = apply_filters( 'edd_webhook_row_actions', $row_actions, $webhook );
 

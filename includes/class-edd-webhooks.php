@@ -22,8 +22,9 @@ class EDD_Webhooks {
 	public function __construct() {
 		// Create the log post type
 		add_action( 'init', array( $this, 'register_post_type' ), 12 );
-		add_action( 'edd_add_webhook', array( $this, 'new_hook' ) );
-		add_action( 'edd_edit_webhook', array( $this, 'edit_hook' ) );
+		add_action( 'edd_add_webhook', array( $this, 'process_hook_new' ) );
+		add_action( 'edd_edit_webhook', array( $this, 'process_hook_edit' ) );
+		add_action( 'edd_delete_webhook', array( $this, 'process_hook_delete' ) );
 	}
 
 	public function register_post_type() {
@@ -58,7 +59,7 @@ class EDD_Webhooks {
 	}
 
 	public function delete_hook( $hook_id = 0 ) {
-
+		return wp_delete_post( $hook_id, true );
 	}
 
 	public function update_hook( $args = array() ) {
@@ -98,7 +99,7 @@ class EDD_Webhooks {
 		return $this->update_hook( array( 'ID' => $hook_id, 'status' => 'inactive' ) );
 	}
 
-	public function new_hook( $data = array() ) {
+	public function process_hook_new( $data = array() ) {
 		if ( ! isset( $data['edd-webhooks-nonce'] ) || ! wp_verify_nonce( $data['edd-webhooks-nonce'], 'edd_webhooks_nonce' ) )
 			return;
 
@@ -122,7 +123,7 @@ class EDD_Webhooks {
 		}
 	}
 
-	public function edit_hook( $data = array() ) {
+	public function process_hook_edit( $data = array() ) {
 		if ( ! isset( $data['edd-webhooks-nonce'] ) || ! wp_verify_nonce( $data['edd-webhooks-nonce'], 'edd_webhooks_nonce' ) )
 			return;
 
@@ -143,6 +144,20 @@ class EDD_Webhooks {
 			wp_redirect( add_query_arg( 'edd-message', 'webhook_updated', $data['edd-redirect'] ) ); edd_die();
 		} else {
 			wp_redirect( add_query_arg( 'edd-message', 'webhook_update_failed', $data['edd-redirect'] ) ); edd_die();
+		}
+	}
+
+	public function process_hook_delete( $data = array() ) {
+		if ( ! isset( $data['_wpnonce'] ) || ! wp_verify_nonce( $data['_wpnonce'], 'edd_webhooks_nonce' ) )
+			return;
+
+		$hook     = absint( $_GET['webhook'] );
+		$redirect = admin_url( 'edit.php?post_type=download&page=edd-tools&tab=webhooks' );
+
+		if ( $this->delete_hook( $hook ) ) {
+			wp_redirect( add_query_arg( 'edd-message', 'webhook_deleted', $redirect ) ); edd_die();
+		} else {
+			wp_redirect( add_query_arg( 'edd-message', 'webhook_delete_failed', $redirect ) ); edd_die();
 		}
 	}
 
