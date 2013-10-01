@@ -34,7 +34,8 @@ function edd_tools_page() {
 			foreach( edd_get_tools_tabs() as $tab_id => $tab_name ) {
 
 				$tab_url = add_query_arg( array(
-					'tab' => $tab_id
+					'tab'  => $tab_id,
+					'view' => false
 				) );
 
 				$active = $active_tab == $tab_id ? ' nav-tab-active' : '';
@@ -124,16 +125,23 @@ function edd_tools_tab_webhooks() {
 	$webhooks_table = new EDD_Webhooks_Table();
 	$webhooks_table->prepare_items();
 ?>
-	<a href="<?php echo add_query_arg( array( 'edd-action' => 'add_webhooks' ) ); ?>" class="button-primary"><?php _e( 'Add New', 'edd' ); ?></a>
-	<form id="edd-webhooks-filter" method="get" action="<?php echo admin_url( 'edit.php?post_type=download&page=edd-tools&tag=webhooks' ); ?>">
+	<?php
+	if( isset( $_GET['view'] ) && 'edit_webhook' == $_GET['view'] ) {
+		require_once EDD_PLUGIN_DIR . 'includes/admin/tools/edit-webhook.php';
+	} elseif( isset( $_GET['view'] ) && 'add_webhook' == $_GET['view'] ) {
+		require_once EDD_PLUGIN_DIR . 'includes/admin/tools/add-webhook.php';
+	} else { ?>
+		<a href="<?php echo add_query_arg( array( 'view' => 'add_webhook' ) ); ?>" class="button-primary"><?php _e( 'Add New', 'edd' ); ?></a>
+		<form id="edd-webhooks-filter" method="get" action="<?php echo admin_url( 'edit.php?post_type=download&page=edd-tools&tag=webhooks' ); ?>">
 
-		<input type="hidden" name="post_type" value="download" />
-		<input type="hidden" name="page" value="edd-tools" />
-		<input type="hidden" name="tab" value="webhooks" />
+			<input type="hidden" name="post_type" value="download" />
+			<input type="hidden" name="page" value="edd-tools" />
+			<input type="hidden" name="tab" value="webhooks" />
 
-		<?php $webhooks_table->views() ?>
-		<?php $webhooks_table->display() ?>
-	</form>
+			<?php $webhooks_table->views() ?>
+			<?php $webhooks_table->display() ?>
+		</form>
+	<?php } ?>
 <?php
 }
 add_action( 'edd_tools_tab_webhooks', 'edd_tools_tab_webhooks' );

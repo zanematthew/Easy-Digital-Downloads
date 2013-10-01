@@ -40,7 +40,7 @@ function edd_add_discount( $data ) {
 			wp_redirect( add_query_arg( 'edd-message', 'discount_added', $data['edd-redirect'] ) ); edd_die();
 		} else {
 			wp_redirect( add_query_arg( 'edd-message', 'discount_add_failed', $data['edd-redirect'] ) ); edd_die();
-		}		
+		}
 	}
 }
 add_action( 'edd_add_discount', 'edd_add_discount' );

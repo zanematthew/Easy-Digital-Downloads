@@ -86,7 +86,7 @@ class EDD_Webhooks_Table extends WP_List_Table {
 	 * @return array $views All the views available
 	 */
 	public function get_views() {
-		$base           = admin_url('edit.php?post_type=download&page=edd-tools&view=webhooks');
+		$base           = admin_url('edit.php?post_type=download&page=edd-tools&tab=webhooks');
 
 		$current        = isset( $_GET['status'] ) ? $_GET['status'] : '';
 		$total_count    = '&nbsp;<span class="count">(' . $this->total_count    . ')</span>';
@@ -113,7 +113,7 @@ class EDD_Webhooks_Table extends WP_List_Table {
 		$columns = array(
 			'cb'        => '<input type="checkbox" />',
 			'name'  	=> __( 'Name', 'edd' ),
-			'uri'     	=> __( 'URL', 'edd' ),
+			'url'     	=> __( 'URL', 'edd' ),
 			'status'  	=> __( 'Status', 'edd' ),
 		);
 
@@ -145,10 +145,18 @@ class EDD_Webhooks_Table extends WP_List_Table {
 	 * @return string Column Name
 	 */
 	function column_default( $item, $column_name ) {
-		switch( $column_name ){
+		switch( $column_name ) {
+
+			case 'url' :
+				$value = $item->guid;
+				break;
+			case 'status' :
+				$value = get_post_status( $item->ID );
 			default:
-				return $item[ $column_name ];
+				$value = $item->$column_name;
+				break;
 		}
+		return $value;
 	}
 
 	/**
@@ -160,22 +168,22 @@ class EDD_Webhooks_Table extends WP_List_Table {
 	 * @return string Data shown in the Name column
 	 */
 	function column_name( $item ) {
-		$webhook     = get_post( $item['ID'] );
-		$base         = admin_url( 'edit.php?post_type=download&page=edd-tools&edd-action=edit_webhook&webhook=' . $item['ID'] );
+		$webhook     = get_post( $item->ID );
+		$base         = admin_url( 'edit.php?post_type=download&page=edd-tools&view=edit_webhook&webhook=' . $item->ID );
 		$row_actions  = array();
 
-		$row_actions['edit'] = '<a href="' . add_query_arg( array( 'edd-action' => 'edit_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Edit', 'edd' ) . '</a>';
+		$row_actions['edit'] = '<a href="' . add_query_arg( array( 'view' => 'edit_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Edit', 'edd' ) . '</a>';
 
-		if( strtolower( $item['status'] ) == 'active' )
-			$row_actions['deactivate'] = '<a href="' . add_query_arg( array( 'edd-action' => 'deactivate_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Deactivate', 'edd' ) . '</a>';
+		if( strtolower( $item->status ) == 'active' )
+			$row_actions['deactivate'] = '<a href="' . add_query_arg( array( 'view' => 'deactivate_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Deactivate', 'edd' ) . '</a>';
 		else
-			$row_actions['activate'] = '<a href="' . add_query_arg( array( 'edd-action' => 'activate_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Activate', 'edd' ) . '</a>';
+			$row_actions['activate'] = '<a href="' . add_query_arg( array( 'view' => 'activate_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Activate', 'edd' ) . '</a>';
 
-		$row_actions['delete'] = '<a href="' . wp_nonce_url( add_query_arg( array( 'edd-action' => 'delete_webhook', 'webhook' => $webhook->ID ) ), 'edd_webhook_nonce' ) . '">' . __( 'Delete', 'edd' ) . '</a>';
+		$row_actions['delete'] = '<a href="' . wp_nonce_url( add_query_arg( array( 'view' => 'delete_webhook', 'webhook' => $webhook->ID ) ), 'edd_webhook_nonce' ) . '">' . __( 'Delete', 'edd' ) . '</a>';
 
 		$row_actions = apply_filters( 'edd_webhook_row_actions', $row_actions, $webhook );
 
-		return stripslashes( $item['name'] ) . $this->row_actions( $row_actions );
+		return stripslashes( $item->post_title ) . $this->row_actions( $row_actions );
 	}
 
 	/**
@@ -190,7 +198,7 @@ class EDD_Webhooks_Table extends WP_List_Table {
 		return sprintf(
 			'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 			/*$1%s*/ 'webhook',
-			/*$2%s*/ $item['ID']
+			/*$2%s*/ $item->ID
 		);
 	}
 
