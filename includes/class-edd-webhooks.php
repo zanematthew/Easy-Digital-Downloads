@@ -25,6 +25,8 @@ class EDD_Webhooks {
 		add_action( 'edd_add_webhook', array( $this, 'process_hook_new' ) );
 		add_action( 'edd_edit_webhook', array( $this, 'process_hook_edit' ) );
 		add_action( 'edd_delete_webhook', array( $this, 'process_hook_delete' ) );
+		add_action( 'edd_activate_webhook', array( $this, 'process_hook_activation' ) );
+		add_action( 'edd_deactivate_webhook', array( $this, 'process_hook_deactivation' ) );
 	}
 
 	public function register_post_type() {
@@ -46,13 +48,44 @@ class EDD_Webhooks {
 		register_post_type( 'edd_webhook', $args );
 	}
 
+	public function get_actions() {
+		$actions = array(
+			'payment_created'    => __( 'Payment Created',    'edd' ),
+			'payment_completed'  => __( 'Payment Completed',  'edd' ),
+			'payment_refunded'   => __( 'Payment Refunded',   'edd' ),
+			'payment_revoked'    => __( 'Payment Revoked',    'edd' ),
+			'payment_deleted'    => __( 'Payment Deleted',    'edd' ),
+			'discount_created'   => __( 'Discount Created',   'edd' ),
+			'discount_deleted'   => __( 'Discount Deleted',   'edd' ),
+			'discount_redeemed'  => __( 'Discount Redeemed',  'edd' ),
+			'download_created'   => __( 'Download Created',   'edd' ),
+			'download_updated'   => __( 'Download Updated',   'edd' ),
+			'download_deleted'   => __( 'Download Deleted',   'edd' ),
+			'download_published' => __( 'Download Published', 'edd' ),
+			'download_purchased' => __( 'Download Purchased', 'edd' )
+		);
+
+		return apply_filters( 'edd_webhook_actions', $actions );
+	}
+
+	public function get_action( $hook_id = 0 ) {
+		return get_post_field( 'post_content', $hook_id );
+	}
+
+	public function get_action_label( $hook_id = 0 ) {
+		$actions = $this->get_actions();
+		$action  = get_post_field( 'post_content', $hook_id );
+		return isset( $actions[ $action ] ) ? $actions[ $action ] : __( 'None set', 'edd' );
+	}
+
 	public function add_hook( $args = array() ) {
 
 		$args = array(
-			'post_type'   => 'edd_webhook',
-			'post_title'  => $args['name'],
-			'post_status' => $args['status'],
-			'guid'        => $args['url']
+			'post_type'    => 'edd_webhook',
+			'post_title'   => $args['name'],
+			'post_status'  => $args['status'],
+			'post_content' => $args['action'],
+			'guid'         => $args['url']
 		);
 
 		return wp_insert_post( $args );
@@ -84,7 +117,10 @@ class EDD_Webhooks {
 			unset( $args['url'] );
 		}
 
-		//print_r( $args ); exit;
+		if( isset( $args['action'] ) ) {
+			$args['post_content'] = $args['action'];
+			unset( $args['action'] );
+		}
 
 		$args = wp_parse_args( $args, $defaults );
 
@@ -158,6 +194,30 @@ class EDD_Webhooks {
 			wp_redirect( add_query_arg( 'edd-message', 'webhook_deleted', $redirect ) ); edd_die();
 		} else {
 			wp_redirect( add_query_arg( 'edd-message', 'webhook_delete_failed', $redirect ) ); edd_die();
+		}
+	}
+
+	public function process_hook_activation( $data = array() ) {
+
+		$hook     = absint( $data['webhook'] );
+		$redirect = admin_url( 'edit.php?post_type=download&page=edd-tools&tab=webhooks' );
+
+		if ( $this->activate_hook( $hook ) ) {
+			wp_redirect( add_query_arg( 'edd-message', 'webhook_activated', $redirect ) ); edd_die();
+		} else {
+			wp_redirect( add_query_arg( 'edd-message', 'webhook_activation_failed', $redirect ) ); edd_die();
+		}
+	}
+
+	public function process_hook_deactivation( $data = array() ) {
+
+		$hook     = absint( $data['webhook'] );
+		$redirect = admin_url( 'edit.php?post_type=download&page=edd-tools&tab=webhooks' );
+
+		if ( $this->deactivate_hook( $hook ) ) {
+			wp_redirect( add_query_arg( 'edd-message', 'webhook_activated', $redirect ) ); edd_die();
+		} else {
+			wp_redirect( add_query_arg( 'edd-message', 'webhook_activation_failed', $redirect ) ); edd_die();
 		}
 	}
 

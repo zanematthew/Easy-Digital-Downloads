@@ -44,12 +44,25 @@ $webhook_id  = absint( $_GET['webhook'] );
 			</tr>
 			<tr class="form-field">
 				<th scope="row" valign="top">
-					<label for="edd-type"><?php _e( 'Type', 'edd' ); ?></label>
+					<label for="edd-status"><?php _e( 'Status', 'edd' ); ?></label>
 				</th>
 				<td>
 					<select name="status" id="edd-status">
 						<option value="active"<?php selected( 'active', get_post_status( $webhook_id ) );?>><?php _e( 'Active', 'edd' ); ?></option>
 						<option value="inactive"<?php selected( 'inactive', get_post_status( $webhook_id ) );?>><?php _e( 'Inactive', 'edd' ); ?></option>
+					</select>
+					<p class="description"><?php _e( 'Set the webhook to active or inactive?', 'edd' ); ?></p>
+				</td>
+			</tr>
+			<tr class="form-field">
+				<th scope="row" valign="top">
+					<label for="edd-action"><?php _e( 'Action', 'edd' ); ?></label>
+				</th>
+				<td>
+					<select name="action" id="edd-action">
+						<?php foreach( EDD()->webhooks->get_actions() as $action_id => $action ) { ?>
+							<option value="<?php echo esc_attr( $action_id ); ?>"<?php selected( $action_id, EDD()->webhooks->get_action( $webhook_id ) ); ?>><?php echo esc_html( $action ); ?></option>
+						<?php } ?>
 					</select>
 					<p class="description"><?php _e( 'Set the webhook to active or inactive?', 'edd' ); ?></p>
 				</td>

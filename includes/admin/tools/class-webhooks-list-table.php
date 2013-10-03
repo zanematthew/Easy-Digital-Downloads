@@ -111,10 +111,11 @@ class EDD_Webhooks_Table extends WP_List_Table {
 	 */
 	public function get_columns() {
 		$columns = array(
-			'cb'        => '<input type="checkbox" />',
-			'name'  	=> __( 'Name', 'edd' ),
-			'url'     	=> __( 'URL', 'edd' ),
-			'status'  	=> __( 'Status', 'edd' ),
+			'cb'     => '<input type="checkbox" />',
+			'name'   => __( 'Name', 'edd' ),
+			'url'    => __( 'URL', 'edd' ),
+			'action' => __( 'Action', 'edd' ),
+			'status' => __( 'Status', 'edd' ),
 		);
 
 		return $columns;
@@ -152,6 +153,10 @@ class EDD_Webhooks_Table extends WP_List_Table {
 				break;
 			case 'status' :
 				$value = get_post_status( $item->ID );
+				break;
+			case 'action' :
+				$value = EDD()->webhooks->get_action_label( $item->ID );
+				break;
 			default:
 				$value = $item->$column_name;
 				break;
@@ -174,7 +179,7 @@ class EDD_Webhooks_Table extends WP_List_Table {
 
 		$row_actions['edit'] = '<a href="' . add_query_arg( array( 'view' => 'edit_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Edit', 'edd' ) . '</a>';
 
-		if( strtolower( $item->status ) == 'active' )
+		if( strtolower( $item->post_status ) == 'active' )
 			$row_actions['deactivate'] = '<a href="' . add_query_arg( array( 'edd_action' => 'deactivate_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Deactivate', 'edd' ) . '</a>';
 		else
 			$row_actions['activate'] = '<a href="' . add_query_arg( array( 'edd_action' => 'activate_webhook', 'webhook' => $webhook->ID ) ) . '">' . __( 'Activate', 'edd' ) . '</a>';
@@ -243,12 +248,12 @@ class EDD_Webhooks_Table extends WP_List_Table {
 			$ids = array( $ids );
 
 		foreach ( $ids as $id ) {
-			if ( 'delete' === $this->current_action() ) {
+			if ( 'delete_webhook' === $this->current_action() ) {
 			}
-			if ( 'activate' === $this->current_action() ) {
+			if ( 'activate_webhook' === $this->current_action() ) {
 				EDD()->webhooks->activate_hook( $id );
 			}
-			if ( 'deactivate' === $this->current_action() ) {
+			if ( 'deactivate_webhook' === $this->current_action() ) {
 				EDD()->webhooks->deactivate_hook( $id );
 			}
 		}
