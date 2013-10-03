@@ -48,6 +48,22 @@ class EDD_Webhooks {
 		register_post_type( 'edd_webhook', $args );
 	}
 
+	public function get_hooks( $args = array() ) {
+
+		$defaults = array(
+			'post_type'      => 'edd_webhook',
+			'posts_per_page' => 30,
+			'paged'          => $args['paged'],
+			'post_status'    => 'any'
+		);
+
+		$args  = wp_parse_args( $args, $defaults );
+		$args  = apply_filters( 'edd_get_webhooks_args', $args );
+		$hooks = get_posts( $args );
+
+		return apply_filters( 'edd_get_webhooks', $hooks );
+	}
+
 	public function get_actions() {
 		$actions = array(
 			'payment_created'    => __( 'Payment Created',    'edd' ),
@@ -91,10 +107,6 @@ class EDD_Webhooks {
 		return wp_insert_post( $args );
 	}
 
-	public function delete_hook( $hook_id = 0 ) {
-		return wp_delete_post( $hook_id, true );
-	}
-
 	public function update_hook( $args = array() ) {
 
 		$defaults = array(
@@ -125,6 +137,10 @@ class EDD_Webhooks {
 		$args = wp_parse_args( $args, $defaults );
 
 		return wp_update_post( $args );
+	}
+
+	public function delete_hook( $hook_id = 0 ) {
+		return wp_delete_post( $hook_id, true );
 	}
 
 	public function activate_hook( $hook_id = 0 ) {
@@ -245,23 +261,6 @@ class EDD_Webhooks {
 			// Log the request here for debugging purposes
 		}
 	}
-
-	public function get_hooks( $args = array() ) {
-
-		$defaults = array(
-			'post_type'      => 'edd_webhook',
-			'posts_per_page' => 30,
-			'paged'          => $args['paged'],
-			'post_status'    => 'any'
-		);
-
-		$args  = wp_parse_args( $args, $defaults );
-		$args  = apply_filters( 'edd_get_webhooks_args', $args );
-		$hooks = get_posts( $args );
-
-		return apply_filters( 'edd_get_webhooks', $hooks );
-	}
-
 
 	private function fire_hooks() {
 
