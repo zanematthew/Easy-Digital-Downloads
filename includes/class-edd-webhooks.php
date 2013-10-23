@@ -114,6 +114,8 @@ class EDD_Webhooks {
 			'post_status' => 'inactive'
 		);
 
+		$args = wp_parse_args( $args, $defaults );
+
 		if( isset( $args['status'] ) ) {
 			$args['post_status'] = $args['status'];
 			unset( $args['status'] );
@@ -134,7 +136,6 @@ class EDD_Webhooks {
 			unset( $args['action'] );
 		}
 
-		$args = wp_parse_args( $args, $defaults );
 
 		return wp_update_post( $args );
 	}
