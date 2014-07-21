@@ -842,11 +842,18 @@ class EDD_API {
 			return $stats;
 		}
 
+		$stats_api = new EDD_Payment_Stats;
+
 		if ( $args['type'] == 'sales' ) {
+			
 			if ( $args['product'] == null ) {
+			
 				if ( $args['date'] == null ) {
+				
 					$sales = $this->get_default_sales_stats();
+				
 				} elseif( $args['date'] === 'range' ) {
+				
 					// Return sales for a date range
 
 					// Ensure the end date is later than the start date
@@ -905,126 +912,78 @@ class EDD_API {
 					endwhile;
 
 					$sales['totals'] = $total;
+				
 				} else {
+					
 					if( $args['date'] == 'this_quarter' || $args['date'] == 'last_quarter'  ) {
-   						$sales_count = 0;
+   					
+						$sales['sales'][ $args['date'] ] = $stats_api->get_sales( 0, $args['date'] );
 
-						// Loop through the months
-						$month = $dates['m_start'];
-
-						while( $month <= $dates['m_end'] ) :
-							$sales_count += edd_get_sales_by_date( null, $month, $dates['year'] );
-							$month++;
-						endwhile;
-
-						$sales['sales'][ $args['date'] ] = $sales_count;
    					} else {
-						$sales['sales'][ $args['date'] ] = edd_get_sales_by_date( $dates['day'], $dates['m_start'], $dates['year'] );
+					   					
+						$sales['sales'][ $args['date'] ] = $stats_api->get_sales( 0, $args['date'] );
+
    					}
+				
 				}
+			
 			} elseif ( $args['product'] == 'all' ) {
+				
 				$products = get_posts( array( 'post_type' => 'download', 'nopaging' => true ) );
 				$i = 0;
+				
 				foreach ( $products as $product_info ) {
+				
 					$sales['sales'][$i] = array( $product_info->post_name => edd_get_download_sales_stats( $product_info->ID ) );
 					$i++;
+				
 				}
+			
 			} else {
+
 				if ( get_post_type( $args['product'] ) == 'download' ) {
+				
 					$product_info = get_post( $args['product'] );
 					$sales['sales'][0] = array( $product_info->post_name => edd_get_download_sales_stats( $args['product'] ) );
+				
 				} else {
+				
 					$error['error'] = sprintf( __( 'Product %s not found!', 'edd' ), $args['product'] );
+				
 				}
+			
 			}
 
-			if ( ! empty( $error ) )
+			if ( ! empty( $error ) ) {
 				return $error;
+			}
 
 			return $sales;
+
 		} elseif ( $args['type'] == 'earnings' ) {
+			
 			if ( $args['product'] == null ) {
+				
 				if ( $args['date'] == null ) {
+				
 					$earnings = $this->get_default_earnings_stats();
+				
 				} elseif ( $args['date'] === 'range' ) {
 
 					// Return sales for a date range
 
-					// Ensure the end date is later than the start date
-					if ( $args['enddate'] < $args['startdate'] ) {
-						$error['error'] = __( 'The end date must be later than the start date!', 'edd' );
-					}
+					// TODO check for valid date ranges here. $stats will be an instance of WP_Error
 
-					// Ensure both the start and end date are specified
-					if ( empty( $args['startdate'] ) || empty( $args['enddate'] ) ) {
-						$error['error'] = __( 'Invalid or no date range specified!', 'edd' );
-					}
+					$earnings['totals'] = $stats_api->get_earnings( 0, $args['startdate'], $args['enddate'] );
 
-					$total = (float) 0.00;
-
-					// Loop through the years
-					$y = $dates['year'];
-					while( $y <= $dates['year_end'] ) :
-
-						if( $dates['year'] == $dates['year_end'] ) {
-							$month_start = $dates['m_start'];
-							$month_end   = $dates['m_end'];
-						} elseif( $y == $dates['year'] && $dates['year_end'] > $dates['year'] ) {
-							$month_start = $dates['m_start'];
-							$month_end   = 12;
-						} elseif( $y == $dates['year_end'] ) {
-							$month_start = 1;
-							$month_end   = $dates['m_end'];
-						} else {
-							$month_start = 1;
-							$month_end   = 12;
-						}
-
-						$i = $month_start;
-						while ( $i <= $month_end ) :
-
-							if( $i == $dates['m_start'] )
-								$d = $dates['day_start'];
-							else
-								$d = 1;
-
-							if( $i == $dates['m_end'] )
-								$num_of_days = $dates['day_end'];
-							else
-								$num_of_days = cal_days_in_month( CAL_GREGORIAN, $i, $y );
-
-							while ( $d <= $num_of_days ) :
-								$earnings_stat = edd_get_earnings_by_date( $d, $i, $y );
-								$earnings['earnings'][ date( 'Ymd', strtotime( $y . '/' . $i . '/' . $d ) ) ] += $earnings_stat;
-								$total += $earnings_stat;
-								$d++;
-							endwhile;
-
-							$i++;
-						endwhile;
-
-						$y++;
-					endwhile;
-
-					$earnings['totals'] = $total;
 				} else {
-					if ( $args['date'] == 'this_quarter' || $args['date'] == 'last_quarter'  ) {
-   						$earnings_count = (float) 0.00;
 
-						// Loop through the months
-						$month = $dates['m_start'];
-
-						while ( $month <= $dates['m_end'] ) :
-							$earnings_count += edd_get_earnings_by_date( null, $month, $dates['year'] );
-							$month++;
-						endwhile;
-
-						$earnings['earnings'][ $args['date'] ] = $earnings_count;
-   					} else {
-						$earnings['earnings'][ $args['date'] ] = edd_get_earnings_by_date( $dates['day'], $dates['m_start'], $dates['year'] );
-   					}
+					$earnings['earnings'][ $args['date'] ] = $stats_api->get_earnings( 0, $args['date'] );
+				
 				}
+
 			} elseif ( $args['product'] == 'all' ) {
+
 				$products = get_posts( array( 'post_type' => 'download', 'nopaging' => true ) );
 
 				$i = 0;
@@ -1032,20 +991,28 @@ class EDD_API {
 					$earnings['earnings'][ $i ] = array( $product_info->post_name => edd_get_download_earnings_stats( $product_info->ID ) );
 					$i++;
 				}
+
 			} else {
+
 				if ( get_post_type( $args['product'] ) == 'download' ) {
+
 					$product_info = get_post( $args['product'] );
 					$earnings['earnings'][0] = array( $product_info->post_name => edd_get_download_earnings_stats( $args['product'] ) );
+				
 				} else {
 					$error['error'] = sprintf( __( 'Product %s not found!', 'edd' ), $args['product'] );
 				}
+
 			}
 
-			if ( ! empty( $error ) )
+			if ( ! empty( $error ) ) {
 				return $error;
+			}
 
 			return $earnings;
+
 		} elseif ( $args['type'] == 'customers' ) {
+
 			global $wpdb;
 
 			$stats = array();
