@@ -947,6 +947,7 @@ class EDD_API {
 				if ( $args['date'] == null ) {
 					$earnings = $this->get_default_earnings_stats();
 				} elseif ( $args['date'] === 'range' ) {
+
 					// Return sales for a date range
 
 					// Ensure the end date is later than the start date
@@ -1411,7 +1412,7 @@ class EDD_API {
 					delete_transient( 'edd-total-api-keys' );
 					wp_redirect( add_query_arg( 'edd-message', 'api-key-generated', 'edit.php?post_type=download&page=edd-tools&tab=api_keys' ) ); exit();
 				} else {
-					wp_redirect( add_query_arg( 'edd-message', 'api-key-exists', 'edit.php?post_type=download&page=edd-tools&tab=api_keys' ) ); exit();	
+					wp_redirect( add_query_arg( 'edd-message', 'api-key-exists', 'edit.php?post_type=download&page=edd-tools&tab=api_keys' ) ); exit();
 				}
 				break;
 			case 'regenerate':
