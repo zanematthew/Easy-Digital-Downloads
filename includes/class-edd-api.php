@@ -915,15 +915,7 @@ class EDD_API {
 				
 				} else {
 					
-					if( $args['date'] == 'this_quarter' || $args['date'] == 'last_quarter'  ) {
-   					
-						$sales['sales'][ $args['date'] ] = $stats_api->get_sales( 0, $args['date'] );
-
-   					} else {
-					   					
-						$sales['sales'][ $args['date'] ] = $stats_api->get_sales( 0, $args['date'] );
-
-   					}
+					$sales['sales'][ $args['date'] ] = $stats_api->get_sales( 0, $args['date'] );
 				
 				}
 			
