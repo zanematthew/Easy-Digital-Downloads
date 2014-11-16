@@ -75,6 +75,11 @@ class EDD_HTML_Elements {
 			}
 		}
 
+		// Backwards compatibility for old Chosen library
+		if( ! empty( $args['chosen'] ) ) {
+			$args['select2'] = true;
+		}
+
 		$output = $this->select( array(
 			'name'             => $args['name'],
 			'selected'         => $args['selected'],
@@ -301,6 +306,11 @@ class EDD_HTML_Elements {
 			$multiple = ' MULTIPLE';
 		} else {
 			$multiple = '';
+		}
+
+		// Backwards compatibility for old Chosen library
+		if( ! empty( $args['chosen'] ) ) {
+			$args['select2'] = true;
 		}
 
 		if( $args['select2'] ) {
