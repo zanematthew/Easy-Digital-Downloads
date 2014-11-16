@@ -40,7 +40,7 @@ class EDD_HTML_Elements {
 			'selected'    => 0,
             'select2'     => false,
             'placeholder' => sprintf( __( 'Select a %s', 'edd' ), edd_get_label_singular() ),
-			'number'      => 30
+			'number'      => 2
 		);
 
 		$args = wp_parse_args( $args, $defaults );

@@ -970,22 +970,6 @@ jQuery(document).ready(function ($) {
 
 	});
 
-    // Setup Select2
-    if ($('.edd-select2').attr('multiple')) {
-        $('.edd-select2').select2({
-            dropdownAutoWidth: true,
-        });
-    } else {
-        $('.edd-select2').select2({
-            dropdownAutoWidth: true,
-        });
-    }
-
-	// Variables for setting up the typing timer
-	var typingTimer;               // Timer identifier
-	var doneTypingInterval = 342;  // Time in ms, Slow - 521ms, Moderate - 342ms, Fast - 300ms
-
-
 	/**
 	 * Tools screen JS
 	 */
@@ -1040,5 +1024,19 @@ jQuery(document).ready(function ($) {
 		$('.edd-ajax-user-search').val(login);
 		$('.edd_user_search_results').html('');
 	});
+
+	/*
+	// Setup Chosen menus
+    $('.edd-select-chosen').chosen({
+    	inherit_select_classes: true,
+    	placeholder_text_single: edd_vars.one_option,
+    	placeholder_text_multiple: edd_vars.one_or_more_option,
+    });
+	*/
+
+	// Setup Select2
+    $('.edd-select2').select2({
+        dropdownAutoWidth: true
+    });
 
 });
