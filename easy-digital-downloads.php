@@ -290,6 +290,7 @@ final class Easy_Digital_Downloads {
 			require_once EDD_PLUGIN_DIR . 'includes/admin/export-functions.php';
 			require_once EDD_PLUGIN_DIR . 'includes/admin/thickbox.php';
 			require_once EDD_PLUGIN_DIR . 'includes/admin/upload-functions.php';
+			require_once EDD_PLUGIN_DIR . 'includes/admin/downloads/class-edd-price-options.php';
 			require_once EDD_PLUGIN_DIR . 'includes/admin/downloads/dashboard-columns.php';
 			require_once EDD_PLUGIN_DIR . 'includes/admin/downloads/metabox.php';
 			require_once EDD_PLUGIN_DIR . 'includes/admin/downloads/contextual-help.php';
