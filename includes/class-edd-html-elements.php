@@ -367,12 +367,45 @@ class EDD_HTML_Elements {
 		$defaults = array(
 			'name'     => null,
 			'current'  => null,
+			'value'    => null,
 			'class'    => 'edd-checkbox'
 		);
 
 		$args = wp_parse_args( $args, $defaults );
 
+		if( isset( $args['value'] ) ) {
+			$args['current'] = $args['value'];
+		}
+
 		$output = '<input type="checkbox" name="' . esc_attr( $args[ 'name' ] ) . '" id="' . esc_attr( $args[ 'name' ] ) . '" class="' . $args[ 'class' ] . ' ' . esc_attr( $args[ 'name'] ) . '" ' . checked( 1, $args[ 'current' ], false ) . ' />';
+
+		return $output;
+	}
+
+	/**
+	 * Renders an HTML Radio
+	 *
+	 * @since 2.3
+	 *
+	 * @param array $args
+	 *
+	 * @return string
+	 */
+	public function radio( $args = array() ) {
+		$defaults = array(
+			'name'     => null,
+			'current'  => null,
+			'value'    => null,
+			'class'    => 'edd-radio'
+		);
+
+		$args = wp_parse_args( $args, $defaults );
+
+		if( isset( $args['value'] ) ) {
+			$args['current'] = $args['value'];
+		}
+
+		$output = '<input type="radio" name="' . esc_attr( $args[ 'name' ] ) . '" id="' . esc_attr( $args[ 'name' ] ) . '" class="' . $args[ 'class' ] . ' ' . esc_attr( $args[ 'name'] ) . '" ' . checked( 1, $args[ 'current' ], false ) . ' />';
 
 		return $output;
 	}
