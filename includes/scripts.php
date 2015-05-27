@@ -158,8 +158,8 @@ function edd_load_admin_scripts( $hook ) {
 
 	// These have to be global
 	wp_enqueue_style( 'jquery-chosen', $css_dir . 'chosen' . $suffix . '.css', array(), EDD_VERSION );
-	wp_enqueue_script( 'jquery-chosen', $js_dir . 'chosen.jquery' . $suffix . '.js', array( 'jquery', 'inline-edit-post' ), EDD_VERSION );
-	wp_enqueue_script( 'edd-admin-scripts', $js_dir . 'admin-scripts' . $suffix . '.js', array( 'jquery' ), EDD_VERSION, false );
+	wp_enqueue_script( 'jquery-chosen', $js_dir . 'chosen.jquery' . $suffix . '.js', array( 'jquery' ), EDD_VERSION );
+	wp_enqueue_script( 'edd-admin-scripts', $js_dir . 'admin-scripts' . $suffix . '.js', array( 'jquery', 'inline-edit-post' ), EDD_VERSION, false );
 	wp_localize_script( 'edd-admin-scripts', 'edd_vars', array(
 		'post_id'                 => isset( $post->ID ) ? $post->ID : null,
 		'edd_version'             => EDD_VERSION,
